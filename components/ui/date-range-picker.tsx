@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { formatDateOnly, parseDateOnly } from "@/lib/format/date-only"
+import { clampToToday, formatDateOnly, getTodayStart, parseDateOnly } from "@/lib/format/date-only"
 import { isRangeSelectionComplete } from "@/lib/format/date-range-picker"
 import { cn } from "@/lib/utils"
 
@@ -62,8 +62,10 @@ export const DateRangePicker = ({
       onRangeChange("", "")
       return
     }
-    const fromStr = next.from ? formatDateOnly(next.from) : ""
-    const toStr = next.to ? formatDateOnly(next.to) : ""
+    const fromDate = next.from ? clampToToday(next.from) : undefined
+    const toDate = next.to ? clampToToday(next.to) : undefined
+    const fromStr = fromDate ? formatDateOnly(fromDate) : ""
+    const toStr = toDate ? formatDateOnly(toDate) : ""
     onRangeChange(fromStr, toStr)
     if (isRangeSelectionComplete(next)) {
       setOpen(false)
@@ -100,10 +102,11 @@ export const DateRangePicker = ({
         <Calendar
           mode="range"
           min={1}
-          defaultMonth={range?.from ?? range?.to}
+          defaultMonth={range?.from ?? range?.to ?? getTodayStart()}
           selected={range}
           onSelect={handleSelect}
           numberOfMonths={isMobile ? 1 : 2}
+          disabled={{ after: getTodayStart() }}
         />
         {hasValue ? (
           <div className="border-t border-border p-2">

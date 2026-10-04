@@ -166,7 +166,7 @@ Match the operator console sidebar pattern from your reference (grouped sections
   - [x] Semantic badges + shared order status mapping (AC-4, AC-5)
   - [x] Shimmer loaders + orders or dashboard wiring (AC-6, AC-7)
   - [x] Guidelines pass + mobile or collapse checks (AC-2, AC-8)
-- [ ] Verify it: `/check verify console sidebar & visual polish`
+- [x] Verify it: `/check verify console sidebar & visual polish`
 - [ ] Test it: `/test console sidebar & visual polish`
 Spec [0006](../specs/0006-console-sidebar-visual-polish.md) · code in `components/layout/`, `components/ui/`, `components/feedback/`, `components/orders/`, `components/dashboard/`
 

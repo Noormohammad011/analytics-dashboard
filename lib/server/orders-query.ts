@@ -1,6 +1,7 @@
-import type { Order, OrderListItem, OrderStatus } from "@/lib/types"
+import { filterOrdersByFuseQuery } from "@/lib/orders/fuse-search"
 import { getSeedData } from "@/lib/server/data"
 import { isWithinRange } from "@/lib/server/date-range"
+import type { OrderListItem, OrderStatus } from "@/lib/types"
 
 export type OrdersQuery = {
   q?: string
@@ -9,16 +10,6 @@ export type OrdersQuery = {
   to?: Date
   page: number
   pageSize: number
-}
-
-const matchesSearch = (order: Order, customerName: string, q: string) => {
-  const needle = q.trim().toLowerCase()
-  if (!needle) return true
-  return (
-    order.id.toLowerCase().includes(needle) ||
-    customerName.toLowerCase().includes(needle) ||
-    order.status.toLowerCase().includes(needle)
-  )
 }
 
 export const queryOrders = async (query: OrdersQuery) => {
@@ -40,13 +31,13 @@ export const queryOrders = async (query: OrdersQuery) => {
     filtered = filtered.filter((o) => new Date(o.createdAt) <= to)
   }
 
-  const searchQuery = query.q
+  const searchQuery = query.q?.trim()
   if (searchQuery) {
-    filtered = filtered.filter((order) => {
-      const customer = customerById.get(order.customerId)
-      const name = customer?.name ?? ""
-      return matchesSearch(order, name, searchQuery)
-    })
+    const rows = filtered.map((order) => ({
+      order,
+      customerName: customerById.get(order.customerId)?.name ?? "Unknown",
+    }))
+    filtered = filterOrdersByFuseQuery(rows, searchQuery).map((row) => row.order)
   }
 
   filtered = [...filtered].sort(

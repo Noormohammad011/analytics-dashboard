@@ -23,7 +23,7 @@ Specs 0003 and 0005 established a working shadcn shell, feedback primitives, and
 
 - **AC-1**: `app-shell.tsx` sidebar shows at least three labeled groups: **Workspace** (brand block), **Project** (primary nav: Dashboard, Orders), **Environment** (compact pill, e.g. `Seed` or `Mock API`, plus optional subtitle). Group labels use uppercase muted style per reference.
 - **AC-2**: Active nav item shows a left accent rail (2 to 3px primary), tinted row background, and primary tinted icon or text; inactive items stay muted. Behavior matches on desktop sidebar and mobile sheet (same structure).
-- **AC-3**: Collapsed sidebar (`icon` mode) shows icon only nav with tooltips; env pill collapses to a dot or short label without breaking layout.
+- **AC-3**: Desktop keeps a full width sidebar (no icon rail). `collapsible="offcanvas"` may slide the sidebar off canvas when toggled; product default is sidebar open with no desktop toggle. Below `lg`, navigation opens in a sheet from the hamburger control; sheet repeats the same groups (Workspace, Project, Environment).
 - **AC-4**: `components/ui/badge.tsx` adds semantic variants (or a thin `StatusBadge` wrapper) mapped from domain: order statuses (`paid`, `pending`, `shipped`, `cancelled`, `refunded`), customer status, activity type, KPI delta tone (`positive`, `negative`, `neutral`). Colors are soft fills (e.g. green success, amber warning, blue info, red destructive, gray neutral), not outline only for status chips.
 - **AC-5**: `lib/format/status-badge.ts` (or equivalent) centralizes order status to variant mapping; orders table, recent orders, and order detail sheet use it (no duplicated switch per file).
 - **AC-6**: `Skeleton` or `DataSkeleton` uses a subtle shimmer gradient animation on `bg-muted` with `prefers-reduced-motion: reduce` falling back to static pulse or no animation. Dashboard `loading.tsx`, orders client fetch, and order detail sheet loading use the same pattern.
@@ -159,7 +159,7 @@ The gap is visual hierarchy and semantic color, not architecture. Option 1 deliv
 | --- | --- |
 | Desktop: active Orders shows rail + tint; Dashboard inactive | AC-2 |
 | Mobile sheet: same groups and active state | AC-2 |
-| Collapsed sidebar: icons + tooltips usable | AC-3 |
+| Below lg: hamburger opens sheet with same sidebar groups | AC-3 |
 | Each order status renders distinct soft color | AC-4, AC-5 |
 | Orders filter fetch shows row skeletons, then data | AC-6, AC-7 |
 | `prefers-reduced-motion` reduces animation | AC-6 |

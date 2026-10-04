@@ -5,20 +5,14 @@ import { FilterX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { OrderStatusSelect } from "@/components/orders/order-status-select"
 import { hasActiveOrdersFilters, type OrdersFilterValues } from "@/lib/orders/filters"
-import { ORDER_STATUSES } from "@/lib/types"
 
 export type { OrdersFilterValues }
 
 type OrdersFiltersProps = {
   values: OrdersFilterValues
+  searchPending?: boolean
   onSearchChange: (q: string) => void
   onStatusChange: (status: OrdersFilterValues["status"]) => void
   onDateRangeChange: (from: string, to: string) => void
@@ -27,6 +21,7 @@ type OrdersFiltersProps = {
 
 export const OrdersFilters = ({
   values,
+  searchPending = false,
   onSearchChange,
   onStatusChange,
   onDateRangeChange,
@@ -47,26 +42,12 @@ export const OrdersFilters = ({
           value={values.q}
           onChange={(event) => onSearchChange(event.target.value)}
           className="min-h-11 bg-background"
+          aria-busy={searchPending}
         />
       </div>
       <div className="flex min-w-0 flex-col gap-1.5 md:w-44">
         <span className="text-xs font-medium text-muted-foreground">Status</span>
-        <Select
-          value={values.status}
-          onValueChange={(next) => onStatusChange(next as OrdersFilterValues["status"])}
-        >
-          <SelectTrigger className="min-h-11 w-full bg-background">
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {ORDER_STATUSES.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <OrderStatusSelect value={values.status} onValueChange={onStatusChange} />
       </div>
       <div className="flex min-w-0 flex-col gap-1.5 md:w-auto md:min-w-[17rem]">
         <span className="text-xs font-medium text-muted-foreground" id="orders-date-range-label">

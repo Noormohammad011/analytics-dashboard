@@ -89,16 +89,6 @@ const ShellNav = () => {
   )
 }
 
-const EnvironmentBlock = () => {
-  return (
-    <div className="flex flex-col gap-2.5 rounded-lg border border-border bg-sidebar-accent/30 px-3 py-2.5">
-      <Badge variant="info" className="w-fit font-medium">
-        Seed
-      </Badge>
-      <p className="text-xs leading-snug text-muted-foreground">Mock API · shadcn/ui</p>
-    </div>
-  )
-}
 
 export const AppShell = ({ children }: AppShellProps) => {
   const pathname = usePathname()
@@ -124,24 +114,11 @@ export const AppShell = ({ children }: AppShellProps) => {
         </SidebarHeader>
         <SidebarContent className="gap-4 py-4">
           <SidebarGroup className="gap-1.5 p-0">
-            <SidebarGroupLabel className={cn(groupLabelClass, "h-auto px-4 py-0")}>
-              Project
-            </SidebarGroupLabel>
             <SidebarGroupContent>
               <ShellNav />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className={cn("border-t border-border py-4", shellSideInset)}>
-          <SidebarGroup className="gap-1.5 p-0">
-            <SidebarGroupLabel className={cn(groupLabelClass, "h-auto px-0 py-0")}>
-              Environment
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <EnvironmentBlock />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header
@@ -150,24 +127,24 @@ export const AppShell = ({ children }: AppShellProps) => {
             "sticky top-0 z-20 gap-2 bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:gap-3",
           )}
         >
-          <AppLogo variant="mark" density="chrome" href="/" className="shrink-0 md:hidden" />
+          <AppLogo variant="mark" density="chrome" href="/" className="shrink-0 lg:hidden" />
           <nav
             className="min-w-0 flex-1 truncate text-sm text-muted-foreground"
             aria-label="Breadcrumb"
           >
             <ol className="flex min-w-0 items-center gap-1.5">
-              <li className="hidden shrink-0 md:list-item">
+              <li className="hidden shrink-0 lg:list-item">
                 <Link href="/" className="transition-colors hover:text-foreground">
                   Pulseboard
                 </Link>
               </li>
-              <li className="hidden shrink-0 text-muted-foreground/60 md:list-item" aria-hidden>
+              <li className="hidden shrink-0 text-muted-foreground/60 lg:list-item" aria-hidden>
                 /
               </li>
               <li className="min-w-0 truncate font-medium text-foreground">{headerTitle}</li>
             </ol>
           </nav>
-          <SidebarMenuTrigger className="md:hidden" />
+          <SidebarMenuTrigger className="lg:hidden" />
         </header>
         <div className="flex flex-1 flex-col">{children}</div>
       </SidebarInset>

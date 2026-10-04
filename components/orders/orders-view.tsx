@@ -9,7 +9,7 @@ import { OrderDetailSheet } from "@/components/orders/order-detail-sheet"
 import { OrdersDataTable } from "@/components/orders/orders-data-table"
 import { OrdersFilters } from "@/components/orders/orders-filters"
 import { OrdersPagination } from "@/components/orders/orders-pagination"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useOrdersSearch } from "@/hooks/use-orders-search"
 import { getOrders } from "@/lib/api/orders"
 import { ApiError } from "@/lib/api/http"
 import { defaultOrdersFilterValues } from "@/lib/orders/filters"
@@ -47,8 +47,13 @@ const paramsFromFilters = (
 })
 
 export const OrdersView = ({ initialData, initialParams, initialQueryKey }: OrdersViewProps) => {
-  const [searchInput, setSearchInput] = React.useState(initialParams.q ?? "")
-  const debouncedSearch = useDebouncedValue(searchInput, 300)
+  const {
+    searchInput,
+    debouncedSearch,
+    isSearchDebouncing,
+    handleSearchChange: setSearchInput,
+    resetSearch,
+  } = useOrdersSearch(initialParams.q ?? "")
   const [filters, setFilters] = React.useState(() => toFilterValues(initialParams))
   const [page, setPage] = React.useState(initialParams.page)
   const [data, setData] = React.useState(initialData)
@@ -112,7 +117,7 @@ export const OrdersView = ({ initialData, initialParams, initialQueryKey }: Orde
   }
 
   const handleClearFilters = () => {
-    setSearchInput("")
+    resetSearch()
     setFilters(defaultOrdersFilterValues())
     setPage(1)
   }
@@ -144,6 +149,7 @@ export const OrdersView = ({ initialData, initialParams, initialQueryKey }: Orde
     <div className="flex flex-col gap-6">
       <OrdersFilters
         values={filterValues}
+        searchPending={isSearchDebouncing}
         onSearchChange={handleSearchChange}
         onStatusChange={handleStatusChange}
         onDateRangeChange={handleDateRangeChange}
@@ -152,16 +158,16 @@ export const OrdersView = ({ initialData, initialParams, initialQueryKey }: Orde
 
       {error ? <ErrorState message={error} onRetry={handleRetry} /> : null}
 
-      {loading && !error ? <OrdersTableSkeleton rows={5} /> : null}
+      {(loading || isSearchDebouncing) && !error ? <OrdersTableSkeleton rows={5} /> : null}
 
-      {!loading && !error && data.items.length === 0 ? (
+      {!loading && !isSearchDebouncing && !error && data.items.length === 0 ? (
         <EmptyState
           title="No orders match your filters"
           description="Try clearing search or widening the date range."
         />
       ) : null}
 
-      {!loading && !error && data.items.length > 0 ? (
+      {!loading && !isSearchDebouncing && !error && data.items.length > 0 ? (
         <>
           <OrdersDataTable orders={data.items} onSelectOrder={handleSelectOrder} />
           <OrdersPagination

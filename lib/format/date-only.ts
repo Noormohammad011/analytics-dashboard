@@ -12,6 +12,17 @@ export const parseDateOnly = (value: string): Date | undefined => {
   return date
 }
 
+import { startOfDay } from "date-fns"
+
+/** Local calendar day for “today”; used to block future dates in pickers. */
+export const getTodayStart = (): Date => startOfDay(new Date())
+
+export const clampToToday = (date: Date): Date => {
+  const today = getTodayStart()
+  const day = startOfDay(date)
+  return day.getTime() > today.getTime() ? today : day
+}
+
 export const formatDateOnly = (date: Date): string => {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, "0")
