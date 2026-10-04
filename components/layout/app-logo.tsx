@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 
 type AppLogoProps = {
   variant?: "full" | "mark"
+  density?: "default" | "chrome"
   className?: string
   href?: string
 }
@@ -36,16 +37,43 @@ export const AppLogoMark = ({ className }: { className?: string }) => {
   )
 }
 
-export const AppLogo = ({ variant = "full", className, href = "/" }: AppLogoProps) => {
+export const AppLogo = ({
+  variant = "full",
+  density = "default",
+  className,
+  href = "/",
+}: AppLogoProps) => {
+  const chrome = density === "chrome"
+
   const content = (
-    <div className={cn("flex items-center gap-3", className)}>
-      <AppLogoMark />
+    <div
+      className={cn(
+        "flex w-full min-w-0 items-center justify-start",
+        chrome ? "gap-2.5" : "gap-3",
+        className,
+      )}
+    >
+      <AppLogoMark
+        className={cn(chrome || variant === "mark" ? "size-8 [&_svg]:size-4" : undefined)}
+      />
       {variant === "full" ? (
         <div className="flex min-w-0 flex-col leading-tight">
-          <span className="truncate font-semibold tracking-tight text-sidebar-foreground">
+          <span
+            className={cn(
+              "truncate font-semibold tracking-tight text-sidebar-foreground",
+              chrome ? "text-sm" : undefined,
+            )}
+          >
             Pulseboard
           </span>
-          <span className="truncate text-xs text-muted-foreground">Analytics console</span>
+          <span
+            className={cn(
+              "truncate text-muted-foreground",
+              chrome ? "text-[11px]" : "text-xs",
+            )}
+          >
+            Analytics console
+          </span>
         </div>
       ) : null}
     </div>
@@ -54,7 +82,7 @@ export const AppLogo = ({ variant = "full", className, href = "/" }: AppLogoProp
   return (
     <Link
       href={href}
-      className="rounded-md outline-none ring-sidebar-ring transition-opacity hover:opacity-90 focus-visible:ring-2"
+      className="flex w-full justify-start rounded-md outline-none ring-sidebar-ring transition-opacity hover:opacity-90 focus-visible:ring-2"
       aria-label="Pulseboard home"
     >
       {content}

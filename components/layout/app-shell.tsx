@@ -20,9 +20,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
@@ -37,6 +34,20 @@ const pageTitles: Record<string, string> = {
   "/orders": "Orders",
 }
 
+
+/** Shared top chrome: same height and border token as main header */
+const shellTopChrome =
+  "flex h-14 shrink-0 items-center border-b border-border"
+
+/** Same horizontal inset for logo, labels, and nav icons (desktop + mobile sheet) */
+const shellSideInset = "px-4"
+
+const shellNavIconSlot =
+  "flex size-4 shrink-0 items-center justify-center [&_svg]:size-4 [&_svg]:shrink-0"
+
+const shellNavButtonClass =
+  "h-10 w-full items-center justify-start gap-3 rounded-md pl-4 pr-3 data-active:before:left-0 data-active:before:h-8"
+
 type AppShellProps = {
   children: React.ReactNode
 }
@@ -50,7 +61,7 @@ const ShellNav = () => {
   }
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className="gap-0.5">
       {navItems.map((item) => {
         const active =
           item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
@@ -58,11 +69,20 @@ const ShellNav = () => {
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               isActive={active}
-              className="min-h-11"
-              render={<Link href={item.href} onClick={handleNavClick} />}
+              tooltip={item.label}
+              className={shellNavButtonClass}
+              render={
+                <Link
+                  href={item.href}
+                  onClick={handleNavClick}
+                  aria-current={active ? "page" : undefined}
+                />
+              }
             >
-              <item.icon />
-              <span>{item.label}</span>
+              <span className={shellNavIconSlot} aria-hidden>
+                <item.icon />
+              </span>
+              <span className="leading-none">{item.label}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         )
@@ -71,48 +91,76 @@ const ShellNav = () => {
   )
 }
 
+
+
 export const AppShell = ({ children }: AppShellProps) => {
   const pathname = usePathname()
   const headerTitle = pageTitles[pathname] ?? "Pulseboard"
 
   return (
-    <SidebarProvider>
-      <Sidebar side="left" mobileSide="right" variant="sidebar" collapsible="offcanvas">
-        <SidebarHeader className="gap-3 border-b border-sidebar-border p-4">
-          <AppLogo variant="full" href="/" />
+    <SidebarProvider defaultOpen>
+      <Sidebar
+        side="left"
+        mobileSide="right"
+        variant="sidebar"
+        collapsible="offcanvas"
+        className="border-border"
+      >
+        <SidebarHeader
+          className={cn(
+            shellTopChrome,
+            "flex-row items-center justify-start gap-0 bg-sidebar p-0",
+            shellSideInset,
+          )}
+        >
+          <AppLogo variant="full" density="chrome" href="/" />
         </SidebarHeader>
-        <SidebarContent className="px-2 py-2">
-          <SidebarGroup>
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        <SidebarContent className="gap-4 py-4">
+          <SidebarGroup className="gap-1.5 p-0">
             <SidebarGroupContent>
               <ShellNav />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="p-4">
-          <SidebarSeparator className="mb-3" />
-          <div className="flex flex-col gap-2 px-1">
-            <Badge variant="outline" className="w-fit font-normal text-muted-foreground">
-              Mock API
-            </Badge>
-            <p className="text-xs text-muted-foreground">Seed data · shadcn/ui</p>
-          </div>
-        </SidebarFooter>
-        <SidebarRail />
       </Sidebar>
       <SidebarInset>
         <header
-          className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:gap-3"
+          className={cn(
+            shellTopChrome,
+            "sticky top-0 z-20 gap-2 bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80 lg:gap-3",
+          )}
         >
-          <SidebarTrigger
-            className={cn("size-11 shrink-0 max-lg:hidden")}
-            aria-label="Toggle sidebar"
+          <AppLogo
+            variant="mark"
+            density="chrome"
+            href="/"
+            className="shrink-0 md:hidden"
           />
-          <AppLogo variant="mark" href="/" className="shrink-0 lg:hidden" />
-          <h1 className="min-w-0 flex-1 truncate text-sm font-medium text-foreground lg:text-base">
-            {headerTitle}
-          </h1>
-          <SidebarMenuTrigger className="lg:hidden" />
+          <nav
+            className="min-w-0 flex-1 truncate text-sm text-muted-foreground"
+            aria-label="Breadcrumb"
+          >
+            <ol className="flex min-w-0 items-center gap-1.5">
+              <li className="hidden shrink-0 md:list-item">
+                <Link
+                  href="/"
+                  className="transition-colors hover:text-foreground"
+                >
+                  Pulseboard
+                </Link>
+              </li>
+              <li
+                className="hidden shrink-0 text-muted-foreground/60 md:list-item"
+                aria-hidden
+              >
+                /
+              </li>
+              <li className="min-w-0 truncate font-medium text-foreground">
+                {headerTitle}
+              </li>
+            </ol>
+          </nav>
+          <SidebarMenuTrigger className="md:hidden" />
         </header>
         <div className="flex flex-1 flex-col">{children}</div>
       </SidebarInset>

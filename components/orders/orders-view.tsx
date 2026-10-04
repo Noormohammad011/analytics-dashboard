@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { EmptyState } from "@/components/feedback/empty-state"
 import { ErrorState } from "@/components/feedback/error-state"
-import { DataSkeleton } from "@/components/feedback/data-skeleton"
+import { OrdersTableSkeleton } from "@/components/feedback/orders-table-skeleton"
 import { OrderDetailSheet } from "@/components/orders/order-detail-sheet"
 import { OrdersDataTable } from "@/components/orders/orders-data-table"
 import { OrdersFilters } from "@/components/orders/orders-filters"
@@ -160,9 +160,7 @@ export const OrdersView = ({
 
       {error ? <ErrorState message={error} onRetry={handleRetry} /> : null}
 
-      {loading && !error ? (
-        <DataSkeleton rows={6} />
-      ) : null}
+      {loading && !error ? <OrdersTableSkeleton rows={5} /> : null}
 
       {!loading && !error && data.items.length === 0 ? (
         <EmptyState

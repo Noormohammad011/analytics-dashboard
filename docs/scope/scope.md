@@ -64,6 +64,7 @@ Motion tokens live in spec 0003 (`docs/design/motion.md` or spec section).
 | 5   | Dashboard overview                    | Slice 1    | done   |
 | 6   | Orders management                     | Slice 2    | done   |
 | 7   | Submission documentation              | Slice 3    | done   |
+| 8   | Console sidebar & visual polish       | Slice 4    | in-progress |
 
 ## Foundations
 
@@ -151,6 +152,23 @@ README, architecture notes, Server vs Client explanation, performance and motion
 - [ ] Verify it: `/check verify submission documentation`
 - [x] Test it: `/test submission documentation`
       README.md · docs/ARCHITECTURE.md · Vitest suite for core `lib/` logic
+
+## Slice 4: Console polish
+
+### 8. Console sidebar & visual polish · in-progress
+
+Match the operator console sidebar pattern from your reference (grouped sections such as workspace and environment, compact env pill, active item with a clear accent rail and tinted active state, icon rail when collapsed). Upgrade loading feedback so skeletons and inline spinners feel intentional, not generic gray blocks. Give status badges semantic color (orders, dashboard activity, KPI deltas, footer chips) similar to soft green verified and blue env pills in the reference.
+**Done when:** desktop sidebar layout and active states align with the reference; mobile sheet keeps the same hierarchy; shared badge variants map domain statuses to readable color; page and list loading use one polished pattern with shimmer or pulse per motion rules and `prefers-reduced-motion` respected; skill chain run before merge.
+
+- [x] Design it (spec): `/architect console sidebar & visual polish`
+- [x] Build it: `/develop console sidebar & visual polish`
+  - [x] Design tokens + sidebar groups, env pill, active rail (AC-1, AC-2, AC-3)
+  - [x] Semantic badges + shared order status mapping (AC-4, AC-5)
+  - [x] Shimmer loaders + orders or dashboard wiring (AC-6, AC-7)
+  - [x] Guidelines pass + mobile or collapse checks (AC-2, AC-8)
+- [ ] Verify it: `/check verify console sidebar & visual polish`
+- [ ] Test it: `/test console sidebar & visual polish`
+Spec [0006](../specs/0006-console-sidebar-visual-polish.md) · code in `components/layout/`, `components/ui/`, `components/feedback/`, `components/orders/`, `components/dashboard/`
 
 ## Deferred
 

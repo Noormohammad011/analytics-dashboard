@@ -1,5 +1,6 @@
 import { ChartCard } from "@/components/dashboard/chart-card"
 import { Badge } from "@/components/ui/badge"
+import { getActivityTypeBadgeVariant } from "@/lib/format/status-badge"
 import { formatRelativeTime } from "@/lib/format/relative-time"
 import type { Activity } from "@/lib/types"
 
@@ -17,7 +18,9 @@ export const ActivityFeed = ({ activities }: ActivityFeedProps) => {
             className="flex flex-col gap-1 border-b border-border pb-4 last:border-0 last:pb-0"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary">{activity.type}</Badge>
+              <Badge variant={getActivityTypeBadgeVariant(activity.type)}>
+                {activity.type.replaceAll("_", " ")}
+              </Badge>
               <span className="text-xs text-muted-foreground">
                 {formatRelativeTime(activity.createdAt)}
               </span>

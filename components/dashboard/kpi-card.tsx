@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge"
+import { getDeltaToneBadgeVariant } from "@/lib/format/status-badge"
 import {
   Card,
   CardContent,
@@ -16,12 +17,6 @@ type KpiCardProps = {
   className?: string
 }
 
-const deltaVariant = (tone: KpiCardProps["deltaTone"]) => {
-  if (tone === "positive") return "secondary" as const
-  if (tone === "negative") return "destructive" as const
-  return "outline" as const
-}
-
 export const KpiCard = ({
   label,
   value,
@@ -33,7 +28,9 @@ export const KpiCard = ({
     <Card className={cn(className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-2 pb-2">
         <CardDescription>{label}</CardDescription>
-        {delta ? <Badge variant={deltaVariant(deltaTone)}>{delta}</Badge> : null}
+        {delta ? (
+          <Badge variant={getDeltaToneBadgeVariant(deltaTone)}>{delta}</Badge>
+        ) : null}
       </CardHeader>
       <CardContent>
         <CardTitle className="text-2xl font-semibold tabular-nums tracking-tight">

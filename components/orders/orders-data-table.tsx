@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
+import { OrderStatusBadge } from "@/components/orders/order-status-badge"
 import {
   Table,
   TableBody,
@@ -54,7 +54,7 @@ export const OrdersDataTable = ({ orders, onSelectOrder }: OrdersDataTableProps)
                 {formatCents(order.amountCents, order.currency)}
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{order.status}</Badge>
+                <OrderStatusBadge status={order.status} />
               </TableCell>
               <TableCell className="text-muted-foreground">{formatOrderDate(order.createdAt)}</TableCell>
             </TableRow>

@@ -11,7 +11,11 @@ type SidebarMenuTriggerProps = {
 }
 
 export const SidebarMenuTrigger = ({ className }: SidebarMenuTriggerProps) => {
-  const { toggleSidebar } = useSidebar()
+  const { setOpenMobile, openMobile } = useSidebar()
+
+  const handleOpenMenu = () => {
+    setOpenMobile(!openMobile)
+  }
 
   return (
     <Button
@@ -19,7 +23,7 @@ export const SidebarMenuTrigger = ({ className }: SidebarMenuTriggerProps) => {
       variant="ghost"
       size="icon"
       className={cn("size-11 shrink-0", className)}
-      onClick={toggleSidebar}
+      onClick={handleOpenMenu}
       aria-label="Open navigation menu"
     >
       <MenuIcon className="size-5" aria-hidden />
