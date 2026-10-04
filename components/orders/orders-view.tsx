@@ -4,14 +4,15 @@ import * as React from "react"
 
 import { EmptyState } from "@/components/feedback/empty-state"
 import { ErrorState } from "@/components/feedback/error-state"
-import { DataSkeleton } from "@/components/feedback/data-skeleton"
+import { OrdersTableSkeleton } from "@/components/feedback/orders-table-skeleton"
 import { OrderDetailSheet } from "@/components/orders/order-detail-sheet"
 import { OrdersDataTable } from "@/components/orders/orders-data-table"
 import { OrdersFilters } from "@/components/orders/orders-filters"
 import { OrdersPagination } from "@/components/orders/orders-pagination"
-import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useOrdersSearch } from "@/hooks/use-orders-search"
 import { getOrders } from "@/lib/api/orders"
 import { ApiError } from "@/lib/api/http"
+import { defaultOrdersFilterValues } from "@/lib/orders/filters"
 import {
   buildOrdersQueryKey,
   type OrdersPageParams,
@@ -45,13 +46,14 @@ const paramsFromFilters = (
   pageSize,
 })
 
-export const OrdersView = ({
-  initialData,
-  initialParams,
-  initialQueryKey,
-}: OrdersViewProps) => {
-  const [searchInput, setSearchInput] = React.useState(initialParams.q ?? "")
-  const debouncedSearch = useDebouncedValue(searchInput, 300)
+export const OrdersView = ({ initialData, initialParams, initialQueryKey }: OrdersViewProps) => {
+  const {
+    searchInput,
+    debouncedSearch,
+    isSearchDebouncing,
+    handleSearchChange: setSearchInput,
+    resetSearch,
+  } = useOrdersSearch(initialParams.q ?? "")
   const [filters, setFilters] = React.useState(() => toFilterValues(initialParams))
   const [page, setPage] = React.useState(initialParams.page)
   const [data, setData] = React.useState(initialData)
@@ -61,12 +63,7 @@ export const OrdersView = ({
   const [sheetOpen, setSheetOpen] = React.useState(false)
 
   const requestParams = React.useMemo(
-    () =>
-      paramsFromFilters(
-        { ...filters, q: debouncedSearch },
-        page,
-        initialParams.pageSize,
-      ),
+    () => paramsFromFilters({ ...filters, q: debouncedSearch }, page, initialParams.pageSize),
     [filters, debouncedSearch, page, initialParams.pageSize],
   )
 
@@ -92,8 +89,7 @@ export const OrdersView = ({
       })
       .catch((err) => {
         if (!cancelled) {
-          const message =
-            err instanceof ApiError ? err.message : "Could not load orders"
+          const message = err instanceof ApiError ? err.message : "Could not load orders"
           setError(message)
         }
       })
@@ -115,13 +111,14 @@ export const OrdersView = ({
     setPage(1)
   }
 
-  const handleFromChange = (from: string) => {
-    setFilters((prev) => ({ ...prev, from }))
+  const handleDateRangeChange = (from: string, to: string) => {
+    setFilters((prev) => ({ ...prev, from, to }))
     setPage(1)
   }
 
-  const handleToChange = (to: string) => {
-    setFilters((prev) => ({ ...prev, to }))
+  const handleClearFilters = () => {
+    resetSearch()
+    setFilters(defaultOrdersFilterValues())
     setPage(1)
   }
 
@@ -152,26 +149,25 @@ export const OrdersView = ({
     <div className="flex flex-col gap-6">
       <OrdersFilters
         values={filterValues}
+        searchPending={isSearchDebouncing}
         onSearchChange={handleSearchChange}
         onStatusChange={handleStatusChange}
-        onFromChange={handleFromChange}
-        onToChange={handleToChange}
+        onDateRangeChange={handleDateRangeChange}
+        onClearFilters={handleClearFilters}
       />
 
       {error ? <ErrorState message={error} onRetry={handleRetry} /> : null}
 
-      {loading && !error ? (
-        <DataSkeleton rows={6} />
-      ) : null}
+      {(loading || isSearchDebouncing) && !error ? <OrdersTableSkeleton rows={5} /> : null}
 
-      {!loading && !error && data.items.length === 0 ? (
+      {!loading && !isSearchDebouncing && !error && data.items.length === 0 ? (
         <EmptyState
           title="No orders match your filters"
           description="Try clearing search or widening the date range."
         />
       ) : null}
 
-      {!loading && !error && data.items.length > 0 ? (
+      {!loading && !isSearchDebouncing && !error && data.items.length > 0 ? (
         <>
           <OrdersDataTable orders={data.items} onSelectOrder={handleSelectOrder} />
           <OrdersPagination
@@ -183,11 +179,7 @@ export const OrdersView = ({
         </>
       ) : null}
 
-      <OrderDetailSheet
-        orderId={selectedOrderId}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
+      <OrderDetailSheet orderId={selectedOrderId} open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   )
 }

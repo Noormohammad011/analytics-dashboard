@@ -42,3 +42,26 @@ Chart mapping is defined in `app/globals.css` (`--chart-1`, `--chart-2`).
 
 - Minimum tap target: `size-11` (44px) on `SidebarTrigger` and primary icon controls.
 - Focus: rely on shadcn `ring` / `outline-ring` on interactive elements.
+
+## Console sidebar (spec 0006)
+
+| Element | Treatment |
+| --- | --- |
+| Group labels | `WORKSPACE`, `PROJECT`, `ENVIRONMENT` uppercase, 11px, muted |
+| Active nav | 3px left rail `--sidebar-primary`, row tint `sidebar-primary/10`, blue icon |
+| Environment pill | Badge `info` variant, label `Seed` |
+| Collapsed | Icon rail + tooltips on nav; env dot replaces pill |
+
+## Status badges
+
+Semantic Badge variants: `success`, `warning`, `info`, `destructive`, `neutral`. Mapping lives in `lib/format/status-badge.ts`.
+
+| Domain | Example mapping |
+| --- | --- |
+| Order status | paid → success, shipped → info, pending → warning |
+| KPI delta | positive → success, negative → destructive |
+| Activity type | payment_failed → destructive, shipment → success |
+
+## Loading
+
+`skeleton-shimmer` utility in `app/globals.css`: gradient sweep on `Skeleton`; `prefers-reduced-motion` disables sweep, keeps static muted fill.

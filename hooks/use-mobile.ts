@@ -1,20 +1,19 @@
 import * as React from "react"
 
-const MOBILE_BREAKPOINT = 768
-
-const getIsMobile = () =>
-  typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT
+/** Matches Tailwind `lg` (shell hamburger + mobile sidebar sheet). */
+const MOBILE_BREAKPOINT_PX = 1024
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState(getIsMobile)
+  const [isMobile, setIsMobile] = React.useState(false)
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`)
+    const sync = () => {
       setIsMobile(mql.matches)
     }
-    mql.addEventListener("change", onChange)
-    return () => mql.removeEventListener("change", onChange)
+    sync()
+    mql.addEventListener("change", sync)
+    return () => mql.removeEventListener("change", sync)
   }, [])
 
   return isMobile

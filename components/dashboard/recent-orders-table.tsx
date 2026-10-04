@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { ChartCard } from "@/components/dashboard/chart-card"
-import { Badge } from "@/components/ui/badge"
+import { OrderStatusBadge } from "@/components/orders/order-status-badge"
 import {
   Table,
   TableBody,
@@ -42,7 +42,7 @@ export const RecentOrdersTable = ({ orders }: RecentOrdersTableProps) => {
               </TableCell>
               <TableCell>{order.customerName}</TableCell>
               <TableCell>
-                <Badge variant="outline">{order.status}</Badge>
+                <OrderStatusBadge status={order.status} />
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {formatCents(order.amountCents, order.currency)}

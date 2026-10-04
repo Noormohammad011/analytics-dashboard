@@ -2,7 +2,10 @@
 
 import * as React from "react"
 
+import { OrderStatusBadge } from "@/components/orders/order-status-badge"
 import { Badge } from "@/components/ui/badge"
+import { DetailSheetSkeleton } from "@/components/feedback/detail-sheet-skeleton"
+import { getCustomerStatusBadgeVariant } from "@/lib/format/status-badge"
 import {
   Sheet,
   SheetContent,
@@ -10,7 +13,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Spinner } from "@/components/ui/spinner"
 import { ErrorState } from "@/components/feedback/error-state"
 import { getOrderById } from "@/lib/api/orders"
 import { ApiError } from "@/lib/api/http"
@@ -68,11 +70,7 @@ export const OrderDetailSheet = ({ orderId, open, onOpenChange }: OrderDetailShe
           <SheetDescription>Line items and customer summary</SheetDescription>
         </SheetHeader>
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Spinner className="size-6" />
-            </div>
-          ) : null}
+          {loading ? <DetailSheetSkeleton /> : null}
           {error ? <ErrorState message={error} onRetry={handleRetry} /> : null}
           {detail && !loading && !error ? (
             <>
@@ -80,8 +78,10 @@ export const OrderDetailSheet = ({ orderId, open, onOpenChange }: OrderDetailShe
                 <p className="text-sm font-medium">{detail.customer.name}</p>
                 <p className="text-sm text-muted-foreground">{detail.customer.email}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Badge variant="secondary">{detail.customer.status}</Badge>
-                  <Badge variant="outline">{detail.order.status}</Badge>
+                  <Badge variant={getCustomerStatusBadgeVariant(detail.customer.status)}>
+                    {detail.customer.status}
+                  </Badge>
+                  <OrderStatusBadge status={detail.order.status} />
                 </div>
                 <p className="mt-3 text-lg font-semibold tabular-nums">
                   {formatCents(detail.order.amountCents, detail.order.currency)}

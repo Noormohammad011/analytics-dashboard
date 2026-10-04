@@ -1,37 +1,34 @@
 "use client"
 
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { ORDER_STATUSES, type OrderStatus } from "@/lib/types"
+import { FilterX } from "lucide-react"
 
-export type OrdersFilterValues = {
-  q: string
-  status: OrderStatus | "all"
-  from: string
-  to: string
-}
+import { Button } from "@/components/ui/button"
+import { DateRangePicker } from "@/components/ui/date-range-picker"
+import { Input } from "@/components/ui/input"
+import { OrderStatusSelect } from "@/components/orders/order-status-select"
+import { hasActiveOrdersFilters, type OrdersFilterValues } from "@/lib/orders/filters"
+
+export type { OrdersFilterValues }
 
 type OrdersFiltersProps = {
   values: OrdersFilterValues
+  searchPending?: boolean
   onSearchChange: (q: string) => void
   onStatusChange: (status: OrdersFilterValues["status"]) => void
-  onFromChange: (from: string) => void
-  onToChange: (to: string) => void
+  onDateRangeChange: (from: string, to: string) => void
+  onClearFilters: () => void
 }
 
 export const OrdersFilters = ({
   values,
+  searchPending = false,
   onSearchChange,
   onStatusChange,
-  onFromChange,
-  onToChange,
+  onDateRangeChange,
+  onClearFilters,
 }: OrdersFiltersProps) => {
+  const filtersActive = hasActiveOrdersFilters(values)
+
   return (
     <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -44,51 +41,43 @@ export const OrdersFilters = ({
           placeholder="Order id, customer, or status"
           value={values.q}
           onChange={(event) => onSearchChange(event.target.value)}
-          className="min-h-11"
+          className="min-h-11 bg-background"
+          aria-busy={searchPending}
         />
       </div>
       <div className="flex min-w-0 flex-col gap-1.5 md:w-44">
         <span className="text-xs font-medium text-muted-foreground">Status</span>
-        <Select
-          value={values.status}
-          onValueChange={(next) => onStatusChange(next as OrdersFilterValues["status"])}
+        <OrderStatusSelect value={values.status} onValueChange={onStatusChange} />
+      </div>
+      <div className="flex min-w-0 flex-col gap-1.5 md:w-auto md:min-w-[17rem]">
+        <span className="text-xs font-medium text-muted-foreground" id="orders-date-range-label">
+          Date range
+        </span>
+        <DateRangePicker
+          id="orders-date-range"
+          from={values.from}
+          to={values.to}
+          onRangeChange={onDateRangeChange}
+          className="bg-background"
+          placeholder="Pick a date range"
+          aria-labelledby="orders-date-range-label"
+        />
+      </div>
+      <div className="flex min-w-0 flex-col gap-1.5 md:shrink-0">
+        <span className="text-xs font-medium text-muted-foreground md:invisible md:h-4" aria-hidden>
+          Clear
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-11 shrink-0 bg-background"
+          disabled={!filtersActive}
+          onClick={onClearFilters}
+          aria-label="Clear filters"
         >
-          <SelectTrigger className="min-h-11 w-full">
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {ORDER_STATUSES.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="flex min-w-0 flex-col gap-1.5 md:w-40">
-        <label className="text-xs font-medium text-muted-foreground" htmlFor="orders-from">
-          From
-        </label>
-        <Input
-          id="orders-from"
-          type="date"
-          value={values.from}
-          onChange={(event) => onFromChange(event.target.value)}
-          className="min-h-11"
-        />
-      </div>
-      <div className="flex min-w-0 flex-col gap-1.5 md:w-40">
-        <label className="text-xs font-medium text-muted-foreground" htmlFor="orders-to">
-          To
-        </label>
-        <Input
-          id="orders-to"
-          type="date"
-          value={values.to}
-          onChange={(event) => onToChange(event.target.value)}
-          className="min-h-11"
-        />
+          <FilterX className="size-4" aria-hidden />
+        </Button>
       </div>
     </div>
   )
