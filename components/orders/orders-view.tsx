@@ -12,6 +12,7 @@ import { OrdersPagination } from "@/components/orders/orders-pagination"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { getOrders } from "@/lib/api/orders"
 import { ApiError } from "@/lib/api/http"
+import { defaultOrdersFilterValues } from "@/lib/orders/filters"
 import {
   buildOrdersQueryKey,
   type OrdersPageParams,
@@ -45,11 +46,7 @@ const paramsFromFilters = (
   pageSize,
 })
 
-export const OrdersView = ({
-  initialData,
-  initialParams,
-  initialQueryKey,
-}: OrdersViewProps) => {
+export const OrdersView = ({ initialData, initialParams, initialQueryKey }: OrdersViewProps) => {
   const [searchInput, setSearchInput] = React.useState(initialParams.q ?? "")
   const debouncedSearch = useDebouncedValue(searchInput, 300)
   const [filters, setFilters] = React.useState(() => toFilterValues(initialParams))
@@ -61,12 +58,7 @@ export const OrdersView = ({
   const [sheetOpen, setSheetOpen] = React.useState(false)
 
   const requestParams = React.useMemo(
-    () =>
-      paramsFromFilters(
-        { ...filters, q: debouncedSearch },
-        page,
-        initialParams.pageSize,
-      ),
+    () => paramsFromFilters({ ...filters, q: debouncedSearch }, page, initialParams.pageSize),
     [filters, debouncedSearch, page, initialParams.pageSize],
   )
 
@@ -92,8 +84,7 @@ export const OrdersView = ({
       })
       .catch((err) => {
         if (!cancelled) {
-          const message =
-            err instanceof ApiError ? err.message : "Could not load orders"
+          const message = err instanceof ApiError ? err.message : "Could not load orders"
           setError(message)
         }
       })
@@ -115,13 +106,14 @@ export const OrdersView = ({
     setPage(1)
   }
 
-  const handleFromChange = (from: string) => {
-    setFilters((prev) => ({ ...prev, from }))
+  const handleDateRangeChange = (from: string, to: string) => {
+    setFilters((prev) => ({ ...prev, from, to }))
     setPage(1)
   }
 
-  const handleToChange = (to: string) => {
-    setFilters((prev) => ({ ...prev, to }))
+  const handleClearFilters = () => {
+    setSearchInput("")
+    setFilters(defaultOrdersFilterValues())
     setPage(1)
   }
 
@@ -154,8 +146,8 @@ export const OrdersView = ({
         values={filterValues}
         onSearchChange={handleSearchChange}
         onStatusChange={handleStatusChange}
-        onFromChange={handleFromChange}
-        onToChange={handleToChange}
+        onDateRangeChange={handleDateRangeChange}
+        onClearFilters={handleClearFilters}
       />
 
       {error ? <ErrorState message={error} onRetry={handleRetry} /> : null}
@@ -181,11 +173,7 @@ export const OrdersView = ({
         </>
       ) : null}
 
-      <OrderDetailSheet
-        orderId={selectedOrderId}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
+      <OrderDetailSheet orderId={selectedOrderId} open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   )
 }
