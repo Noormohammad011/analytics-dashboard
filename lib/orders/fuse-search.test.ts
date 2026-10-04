@@ -27,9 +27,31 @@ describe("filterOrdersByFuseQuery", () => {
     expect(filterOrdersByFuseQuery(rows, "   ")).toHaveLength(2)
   })
 
-  it("ranks order id match first", () => {
+  it("matches a single order id exactly", () => {
     const result = filterOrdersByFuseQuery(rows, "ord_0042")
+    expect(result).toHaveLength(1)
     expect(result[0]?.order.id).toBe("ord_0042")
+  })
+
+  it("does not treat similar order ids as one fuzzy blob", () => {
+    const many: OrderSearchRow[] = [
+      makeRow({ id: "ord_0013", customerName: "A" }),
+      makeRow({ id: "ord_0008", customerName: "B" }),
+      makeRow({ id: "ord_0012", customerName: "C" }),
+    ]
+    expect(filterOrdersByFuseQuery(many, "ord_0013")).toHaveLength(1)
+    expect(filterOrdersByFuseQuery(many, "ord_0013")[0]?.order.id).toBe("ord_0013")
+  })
+
+  it("filters by customer id", () => {
+    const byCustomer: OrderSearchRow[] = [
+      makeRow({ id: "ord_a", customerName: "A" }),
+      makeRow({ id: "ord_b", customerName: "B" }),
+    ]
+    byCustomer[0].order.customerId = "cust_009"
+    byCustomer[1].order.customerId = "cust_014"
+    expect(filterOrdersByFuseQuery(byCustomer, "cust_009")).toHaveLength(1)
+    expect(filterOrdersByFuseQuery(byCustomer, "cust_009")[0]?.order.id).toBe("ord_a")
   })
 
   it("fuzzy matches customer name with typos", () => {
