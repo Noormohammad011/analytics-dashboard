@@ -24,9 +24,14 @@ pnpm start
 
 ## Demo deployment
 
-Add your hosted URL here after deploy (Vercel is the default target from spec 0001):
+**Production (Vercel):** [https://pulseboard-silk-one.vercel.app](https://pulseboard-silk-one.vercel.app)
 
-`https://your-deployment.vercel.app`
+- Project: `pulseboard` (team: `noormohammad011s-projects`)
+- Git: [Noormohammad011/analytics-dashboard](https://github.com/Noormohammad011/analytics-dashboard) — pushes to `main` trigger production builds
+- Mock API and seed JSON ship with the repo (`data/seed/*.json`); Route Handlers read them on the server at runtime (no separate database)
+- Health: `/api/health` · Dashboard: `/` · Orders: `/orders`
+
+Optional: add a custom domain in the Vercel project (e.g. `pulseboard.yourdomain.com`) and set `NEXT_PUBLIC_SITE_URL` to that canonical HTTPS origin.
 
 ## Scripts
 
