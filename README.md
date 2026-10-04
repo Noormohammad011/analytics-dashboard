@@ -1,6 +1,8 @@
-# Analytics Dashboard
+# Pulseboard
 
-Production style SaaS analytics dashboard built with Next.js App Router, TypeScript, Tailwind CSS v4, and shadcn/ui. Data is served from versioned JSON seed files through Route Handlers; the UI never imports seed files directly.
+Production-style SaaS analytics console (Next.js App Router, TypeScript, Tailwind CSS v4, shadcn/ui). Versioned JSON seed data flows through Route Handlers and `lib/server`; the UI never imports `data/seed` directly.
+
+**Architecture (interactive):** open [docs/architecture/pulseboard-architecture.html](docs/architecture/pulseboard-architecture.html) in a browser, or edit the source spec at [docs/architecture/pulseboard.architecture.json](docs/architecture/pulseboard.architecture.json).
 
 ## Quick start
 
@@ -28,20 +30,20 @@ Add your hosted URL here after deploy (Vercel is the default target from spec 00
 
 ## Scripts
 
-| Command                             | Purpose                                             |
-| ----------------------------------- | --------------------------------------------------- |
-| `pnpm dev`                          | Development server                                  |
-| `pnpm build`                        | Production build                                    |
-| `pnpm start`                        | Run production server                               |
-| `pnpm lint`                         | ESLint (flat config)                                |
-| `pnpm typecheck`                    | TypeScript `strict` check                           |
-| `pnpm format` / `pnpm format:check` | Prettier                                            |
-| `pnpm test`                         | Vitest unit tests                                   |
-| `pnpm prepare`                      | Install Husky git hooks (runs after `pnpm install`) |
-
-Pre-commit (via Husky): ESLint and Prettier on staged files. See commit conventions in [AGENTS.md](AGENTS.md#git-and-commits).
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Development server |
+| `pnpm build` | Production build |
+| `pnpm start` | Run production server |
+| `pnpm lint` | ESLint (flat config) |
+| `pnpm typecheck` | TypeScript `strict` check |
+| `pnpm format` / `pnpm format:check` | Prettier |
+| `pnpm test` | Vitest unit tests |
+| `pnpm prepare` | Install Husky git hooks (runs after `pnpm install`) |
 | `pnpm seed:generate` | Regenerate `data/seed/*.json` |
 | `pnpm seed:verify` | Validate seed shape |
+
+Pre-commit (via Husky): ESLint and Prettier on staged files. See commit conventions in [AGENTS.md](AGENTS.md#git-and-commits).
 
 ## Folder structure
 
@@ -60,10 +62,10 @@ lib/
   api/                  # Client fetch wrappers (UI calls these)
   server/               # Seed load, queries, analytics (server only)
   dashboard/            # Dashboard page data composition
-  orders/               # URL search param helpers
+  orders/               # URL search param helpers, Fuse search wiring
   format/               # currency, percent, deltas, relative time
   motion/               # Motion tokens + reduced-motion hook
-docs/                   # Scope, specs, architecture, design tokens
+docs/                   # Scope, specs, architecture diagram, design tokens
 ```
 
 ## Data fetching and layering
@@ -76,20 +78,21 @@ data/seed/*.json
   → UI
 ```
 
-- **Server Components** (`app/(dashboard)/**/page.tsx`): load initial data on the server via `lib/api/*` (which calls same-origin Route Handlers) or compose helpers like `lib/dashboard/get-dashboard-data.ts`.
+- **Server Components** (`app/(dashboard)/**/page.tsx`): load initial data on the server via `lib/api/*` (same-origin Route Handlers) or compose helpers like `lib/dashboard/get-dashboard-data.ts`.
 - **Client islands** (`"use client"`): charts (Recharts), motion, orders filters/table/sheet. They call `lib/api/*` only, never `data/seed/*`.
 - **Orders URL state**: filters and pagination sync to the query string (`q`, `status`, `from`, `to`, `page`). The server renders the first page from `searchParams`; the client skips a duplicate fetch when the query matches that server payload, then refetches when filters change.
+- **Orders search**: fuzzy match via Fuse.js in `lib/server` (debounced 300ms on the client).
 
 **Conversion rate (KPI):** `paid / (paid + cancelled + pending)` for orders in the selected date range (default last 30 days on the dashboard).
 
 ## Server vs Client
 
-| Area                              | Mode   | Notes                            |
-| --------------------------------- | ------ | -------------------------------- |
-| Dashboard and orders page shells  | Server | Data fetch, static layout        |
-| KPI stagger, charts, toasts       | Client | `motion`, Recharts               |
-| Orders filters, pagination, sheet | Client | Debounced search, URL sync       |
-| `app/api/**`                      | Server | Reads seed via `lib/server/data` |
+| Area | Mode | Notes |
+| --- | --- | --- |
+| Dashboard and orders page shells | Server | Data fetch, static layout |
+| KPI stagger, charts, toasts | Client | `motion`, Recharts |
+| Orders filters, pagination, sheet | Client | Debounced search, URL sync, date range capped at today |
+| `app/api/**` | Server | Reads seed via `lib/server/data` |
 
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -107,14 +110,14 @@ Full rules: [docs/scope/scope.md](docs/scope/scope.md) (Design and UX standards)
 
 ## Mock API reference
 
-| Endpoint                           | Purpose                                                          |
-| ---------------------------------- | ---------------------------------------------------------------- |
-| `GET /api/analytics/summary`       | KPIs (`from`, `to` query)                                        |
-| `GET /api/analytics/revenue`       | Revenue time series (cents per day)                              |
-| `GET /api/analytics/orders-series` | Order count per day                                              |
-| `GET /api/orders`                  | Paginated list (`q`, `status`, `from`, `to`, `page`, `pageSize`) |
-| `GET /api/orders/[id]`             | Order + customer summary                                         |
-| `GET /api/activities`              | Activity feed (`limit`)                                          |
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /api/analytics/summary` | KPIs (`from`, `to` query) |
+| `GET /api/analytics/revenue` | Revenue time series (cents per day) |
+| `GET /api/analytics/orders-series` | Order count per day |
+| `GET /api/orders` | Paginated list (`q`, `status`, `from`, `to`, `page`, `pageSize`) |
+| `GET /api/orders/[id]` | Order + customer summary |
+| `GET /api/activities` | Activity feed (`limit`) |
 
 ## UI stack
 
@@ -126,7 +129,8 @@ Full rules: [docs/scope/scope.md](docs/scope/scope.md) (Design and UX standards)
 
 - [docs/scope/scope.md](docs/scope/scope.md) — feature scope and UX bar
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — layering and conventions
-- [docs/specs/](docs/specs/) — decision records (0001–0005)
+- [docs/architecture/pulseboard-architecture.html](docs/architecture/pulseboard-architecture.html) — tracer-bullet system map (Archify)
+- [docs/specs/](docs/specs/) — decision records (0001–0006)
 - [docs/design/tokens.md](docs/design/tokens.md) · [docs/design/motion.md](docs/design/motion.md)
 
 ## Agent context

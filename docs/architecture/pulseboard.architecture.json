@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Pulseboard",
+    "quality_profile": "showcase",
+    "output": "pulseboard-architecture.html",
+    "viewBox": [980, 600]
+  },
+  "components": [
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "Operator",
+      "sublabel": "Browser",
+      "pos": [32, 248],
+      "size": [120, 64]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "Pulseboard UI",
+      "sublabel": "app/(dashboard)",
+      "pos": [200, 248],
+      "size": [150, 64],
+      "tag": "RSC + client islands"
+    },
+    {
+      "id": "lib-api",
+      "type": "frontend",
+      "label": "lib/api",
+      "sublabel": "fetchJson",
+      "pos": [400, 248],
+      "size": [130, 64]
+    },
+    {
+      "id": "routes",
+      "type": "backend",
+      "label": "Route Handlers",
+      "sublabel": "app/api/*",
+      "pos": [580, 248],
+      "size": [150, 64]
+    },
+    {
+      "id": "server",
+      "type": "backend",
+      "label": "lib/server",
+      "sublabel": "Zod + queries",
+      "pos": [780, 248],
+      "size": [150, 64]
+    },
+    {
+      "id": "seed",
+      "type": "database",
+      "label": "Seed data",
+      "sublabel": "data/seed/*.json",
+      "pos": [780, 400],
+      "size": [150, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Next.js runtime",
+      "wraps": ["ui", "lib-api", "routes", "server"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "browse",
+      "from": "operator",
+      "to": "ui",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ui-fetch",
+      "from": "ui",
+      "to": "lib-api",
+      "label": "fetch",
+      "labelDy": 56
+    },
+    {
+      "id": "api-call",
+      "from": "lib-api",
+      "to": "routes",
+      "label": "/api/*"
+    },
+    {
+      "id": "handler-logic",
+      "from": "routes",
+      "to": "server"
+    },
+    {
+      "id": "load-seed",
+      "from": "server",
+      "to": "seed",
+      "label": "read seed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Tracer bullet",
+      "items": [
+        "UI never imports data/seed directly",
+        "Dashboard and orders first paint on the server"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Orders path",
+      "items": [
+        "Fuse.js fuzzy search in lib/server",
+        "URL synced filters and debounced client refetch"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Deploy",
+      "items": ["pnpm build → next start", "Optional NEXT_PUBLIC_SITE_URL for SSR"]
+    }
+  ]
+}

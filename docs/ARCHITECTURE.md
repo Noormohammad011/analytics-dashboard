@@ -1,5 +1,7 @@
 # Architecture
 
+**Interactive diagram:** [architecture/pulseboard-architecture.html](architecture/pulseboard-architecture.html) (source: [pulseboard.architecture.json](architecture/pulseboard.architecture.json)).
+
 ## Data flow
 
 ```text
@@ -43,4 +45,4 @@ Target: Vercel or any Node host running `next start`. Optional `NEXT_PUBLIC_SITE
 
 ## Related specs
 
-Stack and folder layout: `docs/specs/0001-platform-stack.md`. Mock API: `0002`. UI foundation: `0003`. Dashboard: `0004`. Orders: `0005`.
+Stack and folder layout: `docs/specs/0001-platform-stack.md`. Mock API: `0002`. UI foundation: `0003`. Dashboard: `0004`. Orders: `0005`. Console shell polish: `0006`.
