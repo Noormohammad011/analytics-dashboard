@@ -28,15 +28,18 @@ Add your hosted URL here after deploy (Vercel is the default target from spec 00
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Development server |
-| `pnpm build` | Production build |
-| `pnpm start` | Run production server |
-| `pnpm lint` | ESLint (flat config) |
-| `pnpm typecheck` | TypeScript `strict` check |
-| `pnpm format` / `pnpm format:check` | Prettier |
-| `pnpm test` | Vitest unit tests |
+| Command                             | Purpose                                             |
+| ----------------------------------- | --------------------------------------------------- |
+| `pnpm dev`                          | Development server                                  |
+| `pnpm build`                        | Production build                                    |
+| `pnpm start`                        | Run production server                               |
+| `pnpm lint`                         | ESLint (flat config)                                |
+| `pnpm typecheck`                    | TypeScript `strict` check                           |
+| `pnpm format` / `pnpm format:check` | Prettier                                            |
+| `pnpm test`                         | Vitest unit tests                                   |
+| `pnpm prepare`                      | Install Husky git hooks (runs after `pnpm install`) |
+
+Pre-commit (via Husky): ESLint and Prettier on staged files. See commit conventions in [AGENTS.md](AGENTS.md#git-and-commits).
 | `pnpm seed:generate` | Regenerate `data/seed/*.json` |
 | `pnpm seed:verify` | Validate seed shape |
 
@@ -81,12 +84,12 @@ data/seed/*.json
 
 ## Server vs Client
 
-| Area | Mode | Notes |
-| --- | --- | --- |
-| Dashboard and orders page shells | Server | Data fetch, static layout |
-| KPI stagger, charts, toasts | Client | `motion`, Recharts |
-| Orders filters, pagination, sheet | Client | Debounced search, URL sync |
-| `app/api/**` | Server | Reads seed via `lib/server/data` |
+| Area                              | Mode   | Notes                            |
+| --------------------------------- | ------ | -------------------------------- |
+| Dashboard and orders page shells  | Server | Data fetch, static layout        |
+| KPI stagger, charts, toasts       | Client | `motion`, Recharts               |
+| Orders filters, pagination, sheet | Client | Debounced search, URL sync       |
+| `app/api/**`                      | Server | Reads seed via `lib/server/data` |
 
 More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
@@ -104,14 +107,14 @@ Full rules: [docs/scope/scope.md](docs/scope/scope.md) (Design and UX standards)
 
 ## Mock API reference
 
-| Endpoint | Purpose |
-| --- | --- |
-| `GET /api/analytics/summary` | KPIs (`from`, `to` query) |
-| `GET /api/analytics/revenue` | Revenue time series (cents per day) |
-| `GET /api/analytics/orders-series` | Order count per day |
-| `GET /api/orders` | Paginated list (`q`, `status`, `from`, `to`, `page`, `pageSize`) |
-| `GET /api/orders/[id]` | Order + customer summary |
-| `GET /api/activities` | Activity feed (`limit`) |
+| Endpoint                           | Purpose                                                          |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `GET /api/analytics/summary`       | KPIs (`from`, `to` query)                                        |
+| `GET /api/analytics/revenue`       | Revenue time series (cents per day)                              |
+| `GET /api/analytics/orders-series` | Order count per day                                              |
+| `GET /api/orders`                  | Paginated list (`q`, `status`, `from`, `to`, `page`, `pageSize`) |
+| `GET /api/orders/[id]`             | Order + customer summary                                         |
+| `GET /api/activities`              | Activity feed (`limit`)                                          |
 
 ## UI stack
 

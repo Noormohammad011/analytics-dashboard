@@ -20,13 +20,13 @@ Production style SaaS analytics dashboard (Next.js App Router, TypeScript, React
 
 Before UI work: `using-superpowers` → **creative-design** → **frontend-design** → **web-design-guidelines**. See `docs/scope/scope.md`.
 
-| Skill | Path |
-| --- | --- |
-| creative-design | `.cursor/skills/creative-design/` |
-| frontend-design | `.cursor/skills/frontend-design/` |
+| Skill                 | Path                                    |
+| --------------------- | --------------------------------------- |
+| creative-design       | `.cursor/skills/creative-design/`       |
+| frontend-design       | `.cursor/skills/frontend-design/`       |
 | web-design-guidelines | `.cursor/skills/web-design-guidelines/` |
-| react-best-practices | `.cursor/skills/react-best-practices/` |
-| composition-patterns | `.cursor/skills/composition-patterns/` |
+| react-best-practices  | `.cursor/skills/react-best-practices/`  |
+| composition-patterns  | `.cursor/skills/composition-patterns/`  |
 
 ## UI stack
 
@@ -45,6 +45,15 @@ Installed UI primitives include: `button`, `card`, `badge`, `skeleton`, `sidebar
 - **Imports:** `@/` alias; server only data in `lib/server/*`; UI fetches via `lib/api/*`
 - **Components:** shadcn primitives in `components/ui/`; feature UI in `components/<area>/`
 - **React:** Server Components by default; `"use client"` only for charts, motion, and interactivity
+
+## Git and commits
+
+- **Hooks:** Husky runs `lint-staged` on pre-commit (ESLint fix + Prettier on staged files).
+- **Message format:** [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): subject` in imperative mood, no trailing period.
+  - Types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `perf`, `test`
+  - Example: `chore(tooling): add husky and lint-staged`
+- **Authoring:** Commits use the developer’s configured `user.name` / `user.email` only. Do not add `Co-Authored-By`, bot names, or AI tool attribution in messages or trailers.
+- **Before push:** `pnpm typecheck`, `pnpm test`, and `pnpm build` for non-trivial changes when hooks did not already run the full suite.
 
 ## Conventions
 

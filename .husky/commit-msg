@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Drop AI tool attribution trailers; commits must use the developer author only.
+if [ -f "$1" ]; then
+  sed -i '/^Co-authored-by:.*cursoragent@cursor\.com/d' "$1"
+  sed -i '/^Co-authored-by:.*Cursor </d' "$1"
+fi
