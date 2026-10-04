@@ -1,5 +1,7 @@
 "use client"
 
+import type { KeyboardEvent } from "react"
+
 import { Badge } from "@/components/ui/badge"
 import {
   Table,
@@ -25,12 +27,17 @@ const formatOrderDate = (iso: string) =>
   })
 
 export const OrdersDataTable = ({ orders, onSelectOrder }: OrdersDataTableProps) => {
+  const handleRowKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, orderId: string) => {
+    if (event.key !== "Enter" && event.key !== " ") return
+    event.preventDefault()
+    onSelectOrder(orderId)
+  }
+
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="sticky left-0 z-10 bg-background">Order</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Status</TableHead>
@@ -39,24 +46,25 @@ export const OrdersDataTable = ({ orders, onSelectOrder }: OrdersDataTableProps)
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell className="sticky left-0 z-10 bg-background">
-                <button
-                  type="button"
-                  className="font-medium text-primary underline-offset-4 hover:underline"
-                  onClick={() => onSelectOrder(order.id)}
-                >
-                  {order.id}
-                </button>
-              </TableCell>
-              <TableCell>{order.customerName}</TableCell>
+            <TableRow
+              key={order.id}
+              tabIndex={0}
+              role="button"
+              aria-label={`View order for ${order.customerName}`}
+              className="cursor-pointer hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+              onClick={() => onSelectOrder(order.id)}
+              onKeyDown={(event) => handleRowKeyDown(event, order.id)}
+            >
+              <TableCell className="font-medium">{order.customerName}</TableCell>
               <TableCell className="tabular-nums">
                 {formatCents(order.amountCents, order.currency)}
               </TableCell>
               <TableCell>
                 <Badge variant="outline">{order.status}</Badge>
               </TableCell>
-              <TableCell className="text-muted-foreground">{formatOrderDate(order.createdAt)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {formatOrderDate(order.createdAt)}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
