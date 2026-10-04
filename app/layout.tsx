@@ -15,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Analytics Dashboard",
-  description: "SaaS analytics dashboard for customers, orders, and activity",
+  title: {
+    default: "Pulseboard",
+    template: "%s · Pulseboard",
+  },
+  description: "Pulseboard analytics console for revenue, orders, and activity",
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
